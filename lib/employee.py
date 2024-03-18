@@ -1,6 +1,8 @@
 # lib/employee.py
+import sqlite3
 from __init__ import CURSOR, CONN
 from department import Department
+from review import Review
 
 class Employee:
 
@@ -186,5 +188,13 @@ class Employee:
         return cls.instance_from_db(row) if row else None
 
     def reviews(self):
+        CONN = sqlite3.connect('company.db')
+        CURSOR = CONN.cursor()
         """Return list of reviews associated with current employee"""
-        pass
+        sql = """
+            SELECT * FROM reviews
+            WHERE employee_id = ?
+        """
+        CURSOR.execute(sql, (self.id,))
+        rows = CURSOR.fetchall()
+        return [Review.instance_from_db(row) for row in rows]
